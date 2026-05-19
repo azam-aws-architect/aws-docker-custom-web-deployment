@@ -1,0 +1,18 @@
+[ USER / BROWSER ]
+       │
+       ▼ (Traffic hits URL)
+┌────────────────────────────────────────────────────────┐
+│ Amazon CloudFront Global CDN (d38my2coaexall.cloudfront.net) │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            │ (Authenticated via Origin Access Control - OAC)
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│ Amazon S3 Private Bucket (mazam-20)                   │
+│   ├── [ index.html ] (Served via Default Root Object)  │
+│   └── Public Access Status: BLOCK ALL PUBLIC ACCESS   │
+└────────────────────────────────────────────────────────┘
+
+🚨 Direct Access Security Check:
+User ──► Direct S3 Object Endpoint ──► [ 403 Forbidden / Access Denied ] 🔒
+User ──► CloudFront Domain ──────────► [ Website Successfully Rendered! ]  ✅
