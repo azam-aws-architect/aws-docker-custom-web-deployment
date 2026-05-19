@@ -1,0 +1,45 @@
+# Project 20: Enterprise Secure Static Website Hosting on AWS
+
+A secure, production-grade cloud architecture implementing static website hosting with zero public access to the backend storage, routed exclusively through a Global Content Delivery Network (CDN).
+
+## 🚀 Architectural Overview
+This project solves a common corporate security challenge: hosting a high-performance marketing website while ensuring that the underlying data container remains 100% private from the public internet.
+
+- **Storage:** Amazon S3 (Fully Private Bucket, Block All Public Access Enabled)
+- **CDN/Edge Routing:** Amazon CloudFront
+- **Security Protocol:** Origin Access Control (OAC) with explicit IAM Bucket Policy restriction
+- **Entry Routing:** Default Root Object Configuration (`index.html`)
+
+---
+
+## 🛠️ Infrastructure Components & Details
+
+| AWS Resource | Configured Resource Name / ID | Purpose |
+| :--- | :--- | :--- |
+| **Amazon S3** | `mazam-20` | Holds corporate static web assets securely. Public endpoints are blocked. |
+| **Amazon CloudFront** | `E34K2IFXHR6065` | Handles global content caching, TLS termination, and secure routing. |
+| **Origin Access Control** | Enabled (OAC) | Modern security standard ensuring only valid CloudFront requests read from S3. |
+
+---
+
+## 🔒 Security Configuration (IAM Bucket Policy)
+To tightly authorize traffic, the following IAM Bucket Policy was applied to the S3 bucket, explicitly granting read access (`s3:GetObject`) only to the dedicated CloudFront Service Principal:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": {
+        "Sid": "AllowCloudFrontServicePrincipalReadOnly",
+        "Effect": "Allow",
+        "Principal": {
+            "Service": "cloudfront.amazonaws.com"
+        },
+        "Action": "s3:GetObject",
+        "Resource": "arn:aws:s3:::mazam-20/*",
+        "Condition": {
+            "StringEquals": {
+                "AWS:SourceArn": "arn:aws:cloudfront::885662727346:distribution/E34K2IFXHR6065"
+            }
+        }
+    }
+}
