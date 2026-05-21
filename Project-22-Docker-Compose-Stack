@@ -1,0 +1,45 @@
+# Project #22: Multi-Container Microservice Engine Deployment via Docker Compose
+
+## 📌 Project Overview
+An enterprise-grade implementation focusing on shifting from manual infrastructure setups to declarative automation. This project leverages **Docker Compose** to provision an interconnected, multi-tier isolated application stack on an **AWS EC2 (Ubuntu)** instance.
+
+---
+
+## 🏗️ Architecture Design & Flow
+1. **Frontend Layer (Web Proxy):** Public-facing Nginx server exposing static configurations on Port `80:80`.
+2. **Backend Layer (Database Engine):** Isolated MySQL 5.7 database container running on a secure internal database tier.
+3. **Network Segment:** Private custom docker bridge network (`corporate-net`) engineered to prevent direct external access to backend data layers.
+
+---
+
+## 🛠️ How to Deploy
+
+### 1. File Configuration (`docker-compose.yml`)
+```yaml
+version: '3.8'
+
+services:
+  web-proxy:
+    image: nginx:latest
+    container_name: app_frontend_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html
+    networks:
+      - corporate-net
+    depends_on:
+      - core-db
+
+  core-db:
+    image: mysql:5.7
+    container_name: app_backend_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: SecureProjectPassword2026
+      MYSQL_DATABASE: corporate_identity_db
+    networks:
+      - corporate-net
+
+networks:
+  corporate-net:
+    driver: bridge
